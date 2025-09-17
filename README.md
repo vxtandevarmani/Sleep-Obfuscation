@@ -20,3 +20,5 @@ features:
     same thing except I can use more assembly wrappers, stack, and functions to 
     help patch the callstack but I have to patch .relocs since PE files rely on
     them to execute under ASLR conditions
+
+PS. All the code is in SleepObf.cc and I kept it in one file so it would be simple to copy it into other instances of the template
