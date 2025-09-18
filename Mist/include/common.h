@@ -52,6 +52,19 @@ extern "C" {
 #define ERROR_UNRESOLVED_MEMORYS	(BYTE)(1 << 2)
 #define ERROR_SOMETHING_VERY_WRONG	(BYTE)(1 << 3)
 
+#define JUMP(x)                 \
+    do {                       \
+        asm goto (             \
+            "jmp %l[" #x "]\n"  \
+            :                   \
+            :                   \
+            :                   \
+            : x                \
+        );                      \
+    } while (0)
+
+
+
 #define INSTRUMENT_CALL() \
     do { \
         base.frame_idx++; \

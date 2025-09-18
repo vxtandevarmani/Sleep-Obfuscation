@@ -71,12 +71,7 @@ void instance::subroutine(void){
 auto declfn instance::start(
     _In_ void* arg
 ) -> void {
-	PVOID Retaddr   = __builtin_return_address( 0 );
-    DBG_PRINTF( "running from %ls (Pid: %d)\n",
-        NtCurrentPeb()->ProcessParameters->ImagePathName.Buffer,
-        NtCurrentTeb()->ClientId.UniqueProcess );
 
-    DBG_PRINTF( "shellcode @ %p [%d bytes]\n", base.address, base.length );
 	int counter = 0;
 	loop:
 		INSTRUMENT_CALL();
@@ -87,13 +82,7 @@ auto declfn instance::start(
 			#ifdef DEBUG
 				msvcrt.printf("[*] Jumping...\n");
 			#endif
-			asm goto (
-				"jmp %l[loop]\n\t"
-				:
-				:
-				:
-				: loop
-			);
+			JUMP(loop);
 		}
 	
 	#ifdef DEBUG

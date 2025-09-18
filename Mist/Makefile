@@ -58,7 +58,7 @@ stomper:
 #@ $(CCX86) test/stomper.cc -o test/stomper.x86.exe -w
 
 run:
-#@ ./test/stomper.x64.exe bin/stardust.x64.bin
+	#@ ./test/stomper.x64.exe bin/stardust.x64.bin
 	@ ./test/loader.exe bin/stardust.x64.bin
 
 clean:
