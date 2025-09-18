@@ -1,5 +1,5 @@
 # Sleep-Obfuscation
-<img width="584" height="874" alt="image" src="https://github.com/user-attachments/assets/962ff957-3016-4079-83c6-887c53e73dc3" />
+<img width="585" height="859" alt="image" src="https://github.com/user-attachments/assets/4f4afdfb-8404-49f8-b24b-6a3325a849cc" />
 
 Basic Sleep obfuscation technique built as a module on the stardust template by 5pider
 
@@ -21,4 +21,4 @@ features:
     help patch the callstack but I have to patch .relocs since PE files rely on
     them to execute under ASLR conditions
 
-PS. All the code is in [SleepObf.cc](https://github.com/vxtandevarmani/Sleep-Obfuscation/blob/main/Mist/src/SleepKit.cc) and I kept it in one file so it would be simple to copy it into other instances of the template
+PS. All the code is in [SleepObf.cc](https://github.com/vxtandevarmani/Sleep-Obfuscation/blob/main/Mist/src/SleepKit.cc) and I kept it in one file so it would be simple to copy it into other instances of the template and also executing this in stomper crashes due to issues with only the ROP chain itself
