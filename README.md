@@ -21,4 +21,4 @@ features:
     help patch the callstack but I have to patch .relocs since PE files rely on
     them to execute under ASLR conditions
 
-PS. All the code is in SleepObf.cc and I kept it in one file so it would be simple to copy it into other instances of the template
+PS. All the code is in [SleepObf.cc](https://github.com/vxtandevarmani/Sleep-Obfuscation/blob/main/Mist/src/SleepKit.cc) and I kept it in one file so it would be simple to copy it into other instances of the template
